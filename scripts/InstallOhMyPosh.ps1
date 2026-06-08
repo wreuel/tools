@@ -46,6 +46,11 @@ Ensure-Command -Name "git" -WingetId "Git.Git"
 Ensure-Command -Name "oh-my-posh" -WingetId "JanDeDobbeleer.OhMyPosh"
 
 # =========================
+# 2b. NODE.JS (required by the Claude statusline.js)
+# =========================
+Ensure-Command -Name "node" -WingetId "OpenJS.NodeJS"
+
+# =========================
 # 3. MESLO FONT (via OMP)
 # =========================
 Write-Host "Checking Meslo Nerd Font..." -ForegroundColor Cyan
@@ -118,17 +123,66 @@ if (Test-Path $claudeDir) {
 
     Ensure-Folder $claudeDir
 
-    $claudeJson = @{
-        statusLine = @{
-            type    = "command"
-            command = "oh-my-posh claude"
-            padding = 0
+    # 6a. Deploy the custom statusline.js from the repo into ~/.claude
+    $statusLineSource = Join-Path $toolsPath "claude\statusline.js"
+    $statusLineDest   = Join-Path $claudeDir "statusline.js"
+
+    if (Test-Path $statusLineSource) {
+        Copy-Item -Path $statusLineSource -Destination $statusLineDest -Force
+        Write-Host "Deployed statusline.js to $statusLineDest" -ForegroundColor Green
+    }
+    else {
+        Write-Host "statusline.js not found at $statusLineSource — skipping copy." -ForegroundColor DarkYellow
+    }
+
+    # 6b. Merge the statusLine setting into existing settings.json (don't clobber other keys)
+    $claudeConfig = @{}
+    if (Test-Path $claudeSettings) {
+        try {
+            $existing = Get-Content $claudeSettings -Raw -ErrorAction Stop | ConvertFrom-Json
+            if ($existing) {
+                $existing.PSObject.Properties | ForEach-Object { $claudeConfig[$_.Name] = $_.Value }
+            }
+        }
+        catch {
+            Write-Host "Could not parse existing settings.json — recreating it." -ForegroundColor DarkYellow
         }
     }
 
-    $claudeJson | ConvertTo-Json -Depth 10 | Set-Content $claudeSettings -Encoding UTF8
+    # On Windows the .js file won't self-execute, so invoke node explicitly with an absolute path.
+    $claudeConfig["statusLine"] = @{
+        type    = "command"
+        command = "node `"$statusLineDest`""
+        padding = 2
+    }
+
+    $claudeConfig | ConvertTo-Json -Depth 10 | Set-Content $claudeSettings -Encoding UTF8
 
     Write-Host "Claude config updated." -ForegroundColor Green
+
+    # 6c. Sanity check — feed sample JSON to the status line and show what it renders
+    if ((Get-Command node -ErrorAction SilentlyContinue) -and (Test-Path $statusLineDest)) {
+        Write-Host "Testing status line output (sample data):" -ForegroundColor Cyan
+
+        $sample = @{
+            model          = @{ display_name = "Claude Opus 4.8" }
+            cost           = @{ total_cost_usd = 1.23; total_duration_ms = 95000 }
+            context_window = @{ used_percentage = 42 }
+            cwd            = $toolsPath
+        } | ConvertTo-Json -Compress
+
+        try {
+            $sample | node $statusLineDest
+            Write-Host "Status line is working." -ForegroundColor Green
+        }
+        catch {
+            Write-Host "Status line test failed: $($_.Exception.Message)" -ForegroundColor Red
+            Write-Host "Open a NEW terminal so 'node' is on PATH, then re-run." -ForegroundColor DarkYellow
+        }
+    }
+    else {
+        Write-Host "Skipping status line test (node not on PATH yet — restart terminal)." -ForegroundColor DarkYellow
+    }
 }
 else {
     Write-Host "Claude not installed — skipping." -ForegroundColor DarkYellow

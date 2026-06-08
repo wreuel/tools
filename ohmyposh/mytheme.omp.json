@@ -1,0 +1,155 @@
+{
+  "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
+  "version": 4,
+  "final_space": true,
+  "blocks": [
+    {
+      "type": "prompt",
+      "alignment": "left",
+      "segments": [
+        {
+          "type": "session",
+          "style": "powerline",
+          "powerline_symbol": "\ue0b0",
+          "template": " \uf007 {{ .UserName }}@{{ .HostName }} ",
+          "foreground": "#ffffff",
+          "background": "#c386f1"
+        },
+        {
+          "type": "path",
+          "style": "powerline",
+          "powerline_symbol": "\ue0b0",
+          "foreground": "p:text-light",
+          "background": "p:path-bg",
+          "template": " \uf07c {{ .Path }} ",
+          "options": {
+            "style": "folder"
+          }
+        },
+        {
+          "type": "executiontime",
+          "style": "powerline",
+          "powerline_symbol": "\ue0b0",
+          "template": " \uf252 {{ .FormattedMs }} ",
+          "foreground": "#ffffff",
+          "background": "#83769c"
+        },
+        {
+          "type": "dotnet",
+          "style": "powerline",
+          "powerline_symbol": "\ue0b0",
+          "template": " .NET {{ if .Unsupported }}\uf071{{ else }}{{ .Full }}{{ end }} ",
+          "foreground": "p:text-light",
+          "background": "#512BD4"
+        },
+        {
+          "type": "node",
+          "style": "powerline",
+          "powerline_symbol": "\ue0b0",
+          "template": " \ue718 {{ if .PackageManagerIcon }}{{ .PackageManagerIcon }} {{ end }}{{ .Full }} ",
+          "foreground": "p:text-light",
+          "background": "#339933"
+        },
+        {
+          "type": "npm",
+          "style": "powerline",
+          "powerline_symbol": "\ue0b0",
+          "template": " \ue71e {{ .Full }} ",
+          "cache": {
+            "duration": "168h",
+            "strategy": "folder"
+          },
+          "foreground": "p:text-light",
+          "background": "#CB3837"
+        },
+        {
+          "type": "angular",
+          "style": "powerline",
+          "powerline_symbol": "\ue0b0",
+          "template": " \ue753 {{ if .Error }}{{ .Error }}{{ else }}{{ .Full }}{{ end }} ",
+          "cache": {
+            "duration": "168h",
+            "strategy": "folder"
+          },
+          "foreground": "p:text-light",
+          "background": "#DD0031"
+        },
+        {
+          "type": "claude",
+          "style": "powerline",
+          "powerline_symbol": "\ue0b0",
+          "template": " \uf0bc9 {{ .Model.DisplayName }} \uf2d0 {{ .TokenUsagePercent.Gauge }}",
+          "cache": {
+            "duration": "168h",
+            "strategy": "folder"
+          },
+          "foreground": "p:text-light",
+          "background": "#D97757"
+        },
+        {
+          "type": "project",
+          "style": "powerline",
+          "powerline_symbol": "\ue0b0",
+          "template": " \ueb30 {{ .Name }}{{ if .Version }} {{ .Version }}{{ end }} ",
+          "foreground": "p:text-light",
+          "background": "p:git-bg"
+        },
+        {
+          "type": "git",
+          "style": "powerline",
+          "powerline_symbol": "\ue0b0",
+          "foreground": "#193549",
+          "background": "#fffb38",
+          "template": " \uf126 {{ .HEAD }}{{ if .BranchStatus }} {{ .BranchStatus }}{{ end }} "
+        },
+        {
+          "type": "status",
+          "style": "powerline",
+          "powerline_symbol": "\ue0b0",
+          "template": " {{ if eq .Code 0 }}\uf00c{{ else }}\uf071 {{ .Code }}{{ end }} ",
+          "foreground": "#ffffff",
+          "background": "#00897b"
+        }
+      ]
+    },
+    {
+      "type": "prompt",
+      "alignment": "right",
+      "segments": [
+        {
+          "type": "shell",
+          "style": "powerline",
+          "powerline_symbol": "\ue0b0",
+          "template": " \ue795 {{ .Name }} ",
+          "foreground": "#ffffff",
+          "background": "#0077c2"
+        },
+        {
+          "type": "battery",
+          "style": "powerline",
+          "powerline_symbol": "\ue0b0",
+          "template": " {{ if not .Error }}{{ .Icon }} {{ .Percentage }}%{{ end }}{{ .Error }} ",
+          "options": {
+            "display_charging": true,
+            "charging_icon": ""
+          },
+          "foreground": "p:text-light",
+          "background": "#f36943"
+        },
+        {
+          "type": "time",
+          "style": "powerline",
+          "powerline_symbol": "\ue0b0",
+          "template": " \uf017 {{ .CurrentDate | date .Format }} ",
+          "foreground": "#111111",
+          "background": "#2e9599"
+        }
+      ]
+    }
+  ],
+  "palette": {
+    "text-light": "#ffffff",
+    "path-bg": "#61AFEF",
+    "git-bg": "#98C379"
+  }
+}
